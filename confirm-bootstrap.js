@@ -26,10 +26,14 @@
             confirmTitle     : 'Please confirm',
             confirmMessage   : 'Are you sure you want to perform this action ?',
             confirmOk        : 'Yes',
+			confirmNoEnabled : false,
+            confirmNo        : 'No',
             confirmCancel    : 'Cancel',
             confirmDirection : 'rtl',
             confirmStyle     : 'primary',
+            confirmNoStyle   : 'warning',
             confirmCallback  : defaultCallback,
+            confirmNoCallback: defaultNoCallback,
             confirmDismiss   : true,
             confirmAutoOpen  : false
         };
@@ -67,13 +71,20 @@
                 '<button class="btn btn-default" data-dismiss="modal">#Cancel#</button>' +
                 '<button class="btn btn-#Style#" data-dismiss="ok">#Ok#</button>'
             ;
+			
+			if (options.confirmNoEnabled == true) {
+                 buttonTemplate += '<button class="btn btn-#NoStyle#" data-dismiss="no">#No#</button>';
+            }
 
             if(options.confirmDirection == 'ltr')
-            {
-                buttonTemplate =
-                    '<button class="btn btn-#Style#" data-dismiss="ok">#Ok#</button>' +
-                    '<button class="btn btn-default" data-dismiss="modal">#Cancel#</button>'
-                ;
+            {				
+				buttonTemplate = '<button class="btn btn-#Style#" data-dismiss="ok">#Ok#</button>';
+
+                 if (options.confirmNoEnabled == true) {
+                     buttonTemplate += '<button class="btn btn-#NoStyle#" data-dismiss="no">#No#</button>';
+                 }
+
+                 buttonTemplate += '<button class="btn btn-default" data-dismiss="modal">#Cancel#</button>';
             }
 
             var confirmTitle = options.confirmTitle;
@@ -95,8 +106,10 @@
                 replace('#Heading#', confirmTitle).
                 replace('#Body#', confirmMessage).
                 replace('#Ok#', options.confirmOk).
+                replace('#No#', options.confirmNo).
                 replace('#Cancel#', options.confirmCancel).
-                replace('#Style#', options.confirmStyle)
+                replace('#Style#', options.confirmStyle).
+                replace('#NoStyle#', options.confirmNoStyle)
             ;
 
             body.append(modalTemplate);
@@ -115,6 +128,13 @@
                 }
                 options.confirmCallback(confirmLink, confirmModal);
             });
+			
+			if (options.confirmNoEnabled == true) {
+				$('button[data-dismiss="no"]', confirmModal).on('click', function (event) {
+					confirmModal.modal('hide');
+					options.confirmNoCallback(confirmLink);
+				});
+			}
 
             if (options.confirmAutoOpen) {
                 confirmModal.modal('show');
@@ -125,5 +145,9 @@
         {
             window.location = $(target).attr('href');
         }
+		
+		function defaultNoCallback(target) {
+             /*No Implementation*/
+         }
     };
 })(jQuery);
